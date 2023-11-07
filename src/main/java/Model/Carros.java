@@ -4,20 +4,22 @@ public class Carros {
 
     // Atributos
 
-    private String marca;
-    private String modelo;
-    private int ano;
-    private String cor;
-    private String placa;
+    public String marca;
+    public String modelo;
+    public int ano;
+    public String cor;
+    public String placa;
+    public int valor;
 
     // Métodos
 
-    public Carros(String marca, String modelo, int ano, String cor, String placa) {
+    public Carros(String marca, String modelo, int ano, String cor, String placa, int valor) {
         this.marca = marca;
         this.modelo = modelo;
         this.ano = ano;
         this.cor = cor;
         this.placa = placa;
+        this.valor = valor;
     }
 
     //Getters and setters
@@ -60,6 +62,14 @@ public class Carros {
 
     public void setPlaca(String placa) {
         this.placa = placa;
+    }
+
+    public int getValor(){
+        return valor;
+    }
+
+    public void setValor(int valor){
+        this.valor = valor;
     }
 
 }

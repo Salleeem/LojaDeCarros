@@ -1,17 +1,110 @@
 package View;
 
+import java.util.ArrayList;
+import java.util.List;
+
+
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+
+// import Controller.CarrosDAO;
+
+import java.awt.GridLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import Model.Carros;
 
 public class PainelCarros extends JPanel {
+    // Atributos(componentes)
+    private JButton cadastrar, apagar, editar;
+    private JTextField carMarcaField, carModeloField, carAnoField, carPlacaField, carValorField;
+    private List<Carros> carros;
+    private JTable table;
+    private DefaultTableModel tableModel;
+    private int linhaSelecionada = -1;
 
-    //Atributos(Componentes)
-
-
-    //Construtor(GUI-JPanel)
+    // Construtor(GUI-JPanel)
     public PainelCarros() {
         super();
-        //Entrada de dados(Input)
-        //Botões de eventos
-        //Tabela de carros
+            // entrada de dados
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        add(new JLabel("Cadastro Carros"));
+        JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new GridLayout(5, 2));
+        inputPanel.add(new JLabel("Marca"));
+        carMarcaField = new JTextField(20);
+        inputPanel.add(carMarcaField);
+        inputPanel.add(new JLabel("Modelo"));
+        carModeloField = new JTextField(20);
+        inputPanel.add(carModeloField);
+        inputPanel.add(new JLabel("Ano"));
+        carAnoField = new JTextField(20);
+        inputPanel.add(carAnoField);
+        inputPanel.add(new JLabel("Placa"));
+        carPlacaField = new JTextField(20);
+        inputPanel.add(carPlacaField);
+        inputPanel.add(new JLabel("Valor"));
+        carValorField = new JTextField(20);
+        inputPanel.add(carValorField);
+        add(inputPanel);
+        JPanel botoes = new JPanel();
+        botoes.add(cadastrar = new JButton("Cadastrar"));
+        botoes.add(editar = new JButton("Editar"));
+        botoes.add(apagar = new JButton("Apagar"));
+
+        add(botoes);
+        // tabela de carros
+        JScrollPane jSPane = new JScrollPane();
+        add(jSPane);
+        tableModel = new DefaultTableModel(new Object[][] {},
+                new String[] { "Marca", "Modelo", "Ano", "Placa", "Valor" });
+        table = new JTable(tableModel);
+        jSPane.setViewportView(table);
+
+        // new CarrosDAO().criaTabela();
+
+        atualizarTabela();
+
+        // botoes de eventos
+        // tratamento de Eventos
+        // tratamento de Eventos
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent evt) {
+                linhaSelecionada = table.rowAtPoint(evt.getPoint());
+                if (linhaSelecionada != -1) {
+                    carMarcaField.setText((String) table.getValueAt(linhaSelecionada, 0));
+                    carModeloField.setText((String) table.getValueAt(linhaSelecionada, 1));
+                    carAnoField.setText(table.getValueAt(linhaSelecionada, 2).toString());
+                    carPlacaField.setText((String) table.getValueAt(linhaSelecionada, 0));
+                    carValorField.setText(table.getValueAt(linhaSelecionada, 2).toString());
+
+                }
+            }
+        });
     }
+
+    private void atualizarTabela() {
+        tableModel.setRowCount(0);
+        // carros = new CarrosDAO().read();
+        Object linha[] = new Object[5];
+        for(int i=0;i<carros.size();i++){
+        linha[0] = carros.get(i).marca;
+        linha[1] = carros.get(i).modelo;
+        linha[2] = carros.get(i).ano;
+        linha[3] = carros.get(i).placa;
+        linha[4] = carros.get(i).valor;
+        tableModel.addRow(linha);
+        }
+    }
+
+    
+   
 }

@@ -1,7 +1,12 @@
 package app;
 
+import View.PainelPrincipal;
+
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello world!");
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            PainelPrincipal frame = new PainelPrincipal();
+            frame.run();
+        });
     }
-}
+} 
