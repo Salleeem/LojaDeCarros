@@ -109,10 +109,10 @@ public class PainelClientes extends JPanel {
                     && !inputDataNascimento.getText().isEmpty()
                     && !inputIdade.getText().isEmpty()) {
 
-                if (control.validaCpf(inputCpf.getText().trim()) && control.validaIdade(inputIdade.getText().trim())
-                        && control.validarData(inputDataNascimento.getText().trim())) {
+                if (control.validaCpf(inputCpf.getText().trim()) && control.validaCpf(inputIdade.getText().trim())
+                        && control.validaCpf(inputDataNascimento.getText().trim())) {
 
-                    control.cadastrarCliente(inputCpf.getText(), inputNome.getText(), inputDataNascimento.getText(),
+                    control.cadastrar(inputCpf.getText(), inputNome.getText(), inputDataNascimento.getText(),
                             inputIdade.getText());
 
                     // Limpa os campos de entrada após a operação de cadastro
@@ -179,7 +179,7 @@ public class PainelClientes extends JPanel {
         for (Clientes cliente : clientes) {
             // Adiciona os dados de cada carro como uma nova linha na tabela Swing
             tableModel.addRow(new Object[] { cliente.getCpf(), cliente.getNomeCompleto(), cliente.getDataNascimento(),
-                    cliente.getIdade() });
+                    cliente.getNome() });
         }
 
     }

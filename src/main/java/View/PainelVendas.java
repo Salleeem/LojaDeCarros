@@ -1,209 +1,137 @@
 package View;
 
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Date;
+import java.util.List;
+import javax.swing.JComboBox;
+
+
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
-import Control.CarrosDAO;
-import Control.ClientesDAO;
-import Control.VendasControl;
-import Control.VendasDAO;
-
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.MouseAdapter;
-import java.util.ArrayList;
-import java.util.List;
-
+import Controller.CarrosCon;
+import Controller.CarrosDAO;
+import Controller.ClientesCon;
+import Controller.ClientesDAO;
+import Controller.ComprasDAO;
+import Controller.ComprasDAO;
 import Model.Carros;
 import Model.Clientes;
 import Model.Compras;
 
 public class PainelVendas extends JPanel {
-    private DefaultTableModel tableModel;
+    // Atributos(componentes)
+    private JButton registrarVenda;
+    private JTextField dataVendaField;
+    private JComboBox<String> carrosComboBox;
+    private JComboBox<String> clientesComboBox;
+    private List<Compras> vendas;
     private JTable table;
-    private int linhaSelecionada = -1;
-    private List<Compras> vendas = new ArrayList<>();
+    private DefaultTableModel tableModel;
     private List<Carros> carros;
     private List<Clientes> clientes;
-    private JComboBox<String> clientesComboBox, carrosComboBox;
-    private JButton realizarVenda, apagarVenda;
-    private JTextField inputData, inputValor;
-    private JScrollPane jSPane;
-    private String clienteVenda, carroVenda;
 
+    
+
+    // Construtor(GUI-JPanel)
     public PainelVendas() {
         super();
 
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)); // Definindo layout do CarrosPanel
-        // ---------------------*
+        // Entrada de dados
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        add(new JLabel("Registro de Vendas"));
+        JPanel inputPanel = new JPanel();
+        inputPanel.setLayout(new GridLayout(4, 2));
+        inputPanel.add(new JLabel("Data da Venda"));
+        dataVendaField = new JTextField(20);
+        inputPanel.add(dataVendaField);
 
-        clientesComboBox = new JComboBox<>();
+        // Carregar carros e clientes do banco de dados
         carrosComboBox = new JComboBox<>();
-        inputData = new JTextField(10);
-        inputValor = new JTextField(10);
-        realizarVenda = new JButton("Realizar venda");
-        apagarVenda = new JButton("Cancela venda");
-        // ---------------------*
+        clientesComboBox = new JComboBox<>();
+        this.attCombo();
 
-        carrosComboBox.addItem("Selecione um carro");
-        carros = new Controller.CarrosDAO().listarTodos();
-        for (Carros carro : carros) {
-            carrosComboBox.addItem(carro.getMarca() + " " + carro.getModelo() + " - PLACA: " + carro.getPlaca());
-        }
-
-        clientesComboBox.addItem("Selecione um cliente");
-        clientes = new Controller.ClientesDAO().listarTodos();
-        // criar um método para atualizar o combobox
-        for (Clientes cliente : clientes) {
-            clientesComboBox.addItem(cliente.getNomeCompleto() + " - CPF: " + cliente.getCpf());
-        }
-        // -------------------*
-        // --------------------------*
-        // Adicionar os componentes:
-        JPanel inputPanel = new JPanel(new GridLayout(2, 4, 2, 4)); // InputPanel
-        inputPanel.add(new JLabel("Cliente: "));
-        inputPanel.add(clientesComboBox);
-        inputPanel.add(new JLabel("Carro: "));
+        inputPanel.add(new JLabel("Carro"));
         inputPanel.add(carrosComboBox);
-        inputPanel.add(new JLabel("Digite a data de hoje:"));
-        inputPanel.add(inputData);
-        inputPanel.add(new JLabel("Digite o valor da venda:"));
-        inputPanel.add(inputValor);
+        inputPanel.add(new JLabel("Cliente"));
+        inputPanel.add(clientesComboBox);
         add(inputPanel);
 
-        // --------------------------*
-        JPanel buttonPanel = new JPanel(); // Painel de botões
-        buttonPanel.add(realizarVenda);
-        buttonPanel.add(apagarVenda);
-        add(buttonPanel);// Adicionando o painel De botões a Tela Principal
+        // Botão para registrar a venda
+        JPanel botoes = new JPanel();
+        botoes.add(registrarVenda = new JButton("Registrar Venda"));
+        add(botoes);
 
-        // --------------------------*
-        jSPane = new JScrollPane(); // Criando um scrollPane
+        // Tabela de vendas
+        JScrollPane jSPane = new JScrollPane();
         add(jSPane);
-        tableModel = new DefaultTableModel(new Object[][] {},
-                new String[] { "Cliente", "Carro", "Data", "Valor" });
+        tableModel = new DefaultTableModel(new Object[][] {}, new String[] { "Data da Venda", "Carro", "Cliente" });
         table = new JTable(tableModel);
         jSPane.setViewportView(table);
-        // Cria o banco de dados caso não tenha sido criado
-        new VendasDAO().criaTabela();
-        // incluindo elementos do banco na criação do painel
+
+        // Incluindo elementos do banco na criação do painel
         atualizarTabela();
-        // ---------------------*
-        // Tratamento de eventos:
-        VendasControl control = new VendasControl(vendas, tableModel, table);
-        realizarVenda.addActionListener(new ActionListener() {
 
+        // Tratamento de eventos
+        registrarVenda.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String carro = String.valueOf(carrosComboBox.getSelectedItem());
-                String cliente = String.valueOf(clientesComboBox.getSelectedItem());
-                if (!carro.equals("Selecione um carro") && !cliente.equals("Selecione um cliente")
-                        && !inputData.getText().isEmpty() && !inputValor.getText().isEmpty()) {
-                    if (control.validarData(inputData.getText()) && control.validarValor(inputValor.getText())) {
-                        control.cadastrarVenda(cliente, carro, inputValor.getText(), inputData.getText());
-                        inputData.setText("");
-                        inputValor.setText("");
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Preencha os campos corretamente!", "ERRO!",
-                                JOptionPane.WARNING_MESSAGE);
-                    }
+                // Obter os valores dos campos de entrada
+                Date dataVenda = new Date(); // Você pode modificar para obter a data de forma apropriada
+                Carros carroSelecionado = (Carros) carrosComboBox.getSelectedItem();
+                Clientes clienteSelecionado = (Clientes) clientesComboBox.getSelectedItem();
 
-                } else {
-                    JOptionPane.showMessageDialog(null, "Preencha os campos corretamente!", "ERRO!",
-                            JOptionPane.WARNING_MESSAGE);
-                }
+                // Chamar o método de registro de venda no controlador
+                new ComprasDAO().registrarVenda(dataVenda, carroSelecionado, clienteSelecionado);
 
+                // Limpar os campos de entrada após a operação de registro de venda
+                dataVendaField.setText("");
+                carrosComboBox.setSelectedIndex(0);
+                clientesComboBox.setSelectedIndex(0);
             }
-
         });
-
-        clientesComboBox.addFocusListener(new FocusAdapter() {
-
-            @Override
-            public void focusGained(FocusEvent e) {
-                atualizaComboBoxClientes();
-            }
-
-        });
-        carrosComboBox.addFocusListener(new FocusAdapter() {
-
-            @Override
-            public void focusGained(FocusEvent e) {
-                atualizaComboBoxCarros();
-            }
-
-        });
-
-        table.addMouseListener(new MouseAdapter() {
-
-            @Override
-            public void mouseClicked(java.awt.event.MouseEvent e) {
-
-                linhaSelecionada = table.rowAtPoint(e.getPoint());
-                if (linhaSelecionada != -1) {
-                    carroVenda = (String) table.getValueAt(linhaSelecionada, 2);
-                    clienteVenda = (String) table.getValueAt(linhaSelecionada, 1);
-                }
-
-            }
-
-        });
-
-        apagarVenda.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int res = JOptionPane.showConfirmDialog(null, "Deseja cancelar esta venda?",
-                        "Cancelar venda", JOptionPane.YES_NO_OPTION);
-
-                if (res == JOptionPane.YES_OPTION) {
-                    control.apagar(carroVenda);
-                }
-            }
-
-        });
-
     }
 
-    public void atualizarTabela() {
-        tableModel.setRowCount(0); // Limpa todas as linhas existentes na tabela
-        vendas = new VendasDAO().listarTodos();
-        // Obtém os clientes atualizados do banco de dados
-        for (compras venda : vendas) {
-            // Adiciona os dados de cada cliente como uma nova linha na tabela Swing
-            tableModel.addRow(new Object[] { venda.getCarro(), venda.getCliente(), venda.getData(),
-                    venda.getValor() });
+    // Atualizar tabela de vendas com o banco de dados
+    private void atualizarTabela() {
+        // Atualizar tabela pelo banco de dados
+        tableModel.setRowCount(0);
+        vendas = new ComprasDAO().listarTodas();
+        for (Compras venda : vendas) {
+            tableModel.addRow(new Object[] { venda.getDataVenda(), venda.getCpf(), venda.getClass() });
         }
-
     }
-
-    public void atualizaComboBoxCarros() {
+    public void attCombo(){
         carrosComboBox.removeAllItems();
-        carrosComboBox.addItem("Selecione um Carro");
-        carros = new CarrosDAO().listarTodos();
-        for (Carros carro : carros) {
-            carrosComboBox.addItem(carro.getMarca() + " " + carro.getModelo() + " - PLACA: " + carro.getPlaca());
-        }
-    }
-
-    public void atualizaComboBoxClientes() {
         clientesComboBox.removeAllItems();
-        clientesComboBox.addItem("Selecione um cliente");
+        carros = new CarrosDAO().listarTodos();
         clientes = new ClientesDAO().listarTodos();
-        // criar um método para atualizar o combobox
-        for (Clientes cliente : clientes) {
-            clientesComboBox.addItem(cliente.getNomeCompleto() + " - CPF: " + cliente.getCpf());
+        for (Carros carro : carros) {
+            carrosComboBox.addItem(carro
+            + " " + carro.getAno()
+            + " " + carro.getMarca()
+            + " " + carro.getAno()
+            + " " + carro.getValor());
+        
+            
         }
+        for (Clientes cliente : clientes) {
+            clientesComboBox.addItem(cliente
+            + " " + cliente.getCpf()
+            + " " + cliente.getEmail()
+            + " " + cliente.getTelefone()
+            + " " + cliente.getNome());
+
+            
+        }
+
     }
 }

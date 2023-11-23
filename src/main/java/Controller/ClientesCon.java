@@ -1,94 +1,65 @@
-    package Controller;
+package Controller;
 
-    import java.time.LocalDate;
-    import java.time.format.DateTimeFormatter;
-    import java.time.format.DateTimeParseException;
-    import java.util.List;
+import java.util.List;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+import Model.Clientes;
+import Model.Compras;
+import logs.Registro;
 
-    import javax.swing.JOptionPane;
-    import javax.swing.JTable;
-    import javax.swing.table.DefaultTableModel;
+public class ClientesCon{
 
-    import Model.Clientes;
+    // Atributos
+    private List<Clientes> clientes; // Lista de objetos Clientes
+    private DefaultTableModel tableModel; // Modelo da tabela Swing para exibição dos dados
+    private JTable table; // Tabela Swing onde os dados são exibidos
 
-    public class ClientesCon {
-        // CRUD
-        private List<Clientes> clientes;
-        private DefaultTableModel tableModel;
-        private JTable table;
+    // Construtor
+    public ClientesCon(List<Clientes> clientes, DefaultTableModel tableModel, JTable table) {
+        this.clientes = clientes; // Inicializa a lista de clientes
+        this.tableModel = tableModel; // Inicializa o modelo da tabela
+        this.table = table; // Inicializa a tabela Swing
+    }
 
-        // Construtor
-        public ClientesCon(List<Clientes> clientes, DefaultTableModel tableModel, JTable table) {
-            this.clientes = clientes;
-            this.tableModel = tableModel;
-            this.table = table;
-        }
-        // -------------------*
-        // Métodos
+    public ClientesCon() {
+    }
 
-        public void atualizarTabela() {
-            tableModel.setRowCount(0); // Limpa todas as linhas existentes na tabela
-            clientes = new ClientesDAO().listarTodos();
-            // Obtém os clientes atualizados do banco de dados
-            for (Clientes cliente : clientes) {
-                // Adiciona os dados de cada cliente como uma nova linha na tabela Swing
-                tableModel.addRow(new Object[] { cliente.getCpf(), cliente.getNomeCompleto(), cliente.getDataNascimento(),
-                        cliente.getIdade() });
-            }
-
-        }
-
-        public void cadastrarCliente(String cpf, String nomeCompleto, String dataNascimento, String idade) {
-            // Adiciona a tabela
-            Clientes cliente = new Clientes(cpf.trim().toUpperCase(), nomeCompleto.trim().toUpperCase(),
-                    dataNascimento.trim(), idade.trim().toUpperCase());
-            clientes.add(cliente);
-            // -----------------------*
-            // Adicionar ao banco de dados
-            new ClientesDAO().cadastrar(cpf, nomeCompleto, dataNascimento, idade);
-            // -----------------------*
-            atualizarTabela();// Atualiza a tabela
-            JOptionPane.showMessageDialog(null, "Cliente cadastrado com sucesso!");
-            // Atualiza o banco de dados
-        }
-
-        // Método para apagar um carro do banco de dados
-        public void apagar(String cpf) {
-            new ClientesDAO().apagar(cpf);
-            // Chama o método de exclusão no banco de dados
-            atualizarTabela(); // Atualiza a tabela de exibição após a exclusão
-            JOptionPane.showMessageDialog(table, "Cliente removido!", null , JOptionPane.ERROR_MESSAGE);
-        }
-
-        public void atualizar(String cpf, String nomeCompleto, String dataNascimento, String idade) {
-            new ClientesDAO().atualizar(cpf, nomeCompleto, dataNascimento, idade);
-            // Chama o método de atualização no banco de dados
-            JOptionPane.showMessageDialog(null, "Cliente atualizado", null, JOptionPane.INFORMATION_MESSAGE);
-            atualizarTabela(); // Atualiza a tabela de exibição após a atualização
-        }
-
-        public boolean validaCpf(String cpf) {
-            if (cpf.matches("[0-9]+")) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        public boolean validaIdade(String idade) {
-            if (idade.matches("[0-9]+")) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        public boolean validarData(String date) { // Verifica se a data digitada segue o formato 'dd/mm/yyyy'
-            try {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                LocalDate d = LocalDate.parse(date, formatter);
-                return true;
-            } catch (DateTimeParseException e) {
-                return false;
-            }
+    // Método para atualizar a tabela de exibição com dados do banco de dados
+    private void atualizarTabela() {
+        tableModel.setRowCount(0); // Limpa todas as linhas existentes na tabela
+        clientes = new ClientesDAO().listarTodos(); // Obtém os clientes atualizados do banco de dados
+        for (Clientes cliente : clientes) {
+            // Adiciona os dados de cada cliente como uma nova linha na tabela Swing
+            tableModel.addRow(new Object[] { cliente.getNome(), cliente.getCpf(), cliente.getTelefone(), cliente.getEmail() });
         }
     }
+
+    // Método para cadastrar um novo cliente no banco de dados
+    public void cadastrar(String nome, String cpf, String telefone, String email) {
+        new ClientesDAO().cadastrar(nome, cpf, telefone, email);
+        // Chama o método de cadastro no banco de dados
+        atualizarTabela(); // Atualiza a tabela de exibição após o cadastro
+    }
+
+    // Método para atualizar os dados de um cliente no banco de dados
+    public void atualizar(String nome, String cpf, String telefone, String email) {
+        new ClientesDAO().atualizar(nome, cpf, telefone, email);
+        // Chama o método de atualização no banco de dados
+        atualizarTabela(); // Atualiza a tabela de exibição após a atualização
+    }
+
+    // Método para apagar um cliente do banco de dados
+    public void apagar(String cpf) {
+        new ClientesDAO().apagar(cpf);
+        // Chama o método de exclusão no banco de dados
+        atualizarTabela(); // Atualiza a tabela de exibição após a exclusão
+    }
+
+    public List<Compras> listarTodos() {
+        return null;
+    }
+
+    public boolean validaCpf(String trim) {
+        return false;
+    }
+}

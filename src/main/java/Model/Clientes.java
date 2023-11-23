@@ -2,27 +2,25 @@ package Model;
 
 public class Clientes {
 
-    // Atributos
-    public String nomeCompleto;
-    public String cpf;
-    public String dataNascimento;
-    public String idade;
+    private String nome;
+    private String cpf;
+    private String telefone;
+    private String email;
 
-    // Construtor
-    public Clientes(String cpf, String nomeCompleto, String dataNascimento, String idade) {
-        this.nomeCompleto = nomeCompleto;
+    public Clientes(String nome, String cpf, String telefone, String email) {
+        this.nome = nome;
         this.cpf = cpf;
-        this.dataNascimento = dataNascimento;
-        this.idade = idade;
+        this.telefone = telefone;
+        this.email = email;
     }
 
     // Getters and Setters
-    public String getNomeCompleto() {
-        return nomeCompleto;
+    public String getNome() {
+        return nome;
     }
 
-    public void setNomeCompleto(String nomeCompleto) {
-        this.nomeCompleto = nomeCompleto;
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public String getCpf() {
@@ -33,20 +31,27 @@ public class Clientes {
         this.cpf = cpf;
     }
 
-    public String getDataNascimento() {
-        return dataNascimento;
+    public String getTelefone() {
+        return telefone;
     }
 
-    public void setDataNascimento(String dataNascimento) {
-        this.dataNascimento = dataNascimento;
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
     }
 
-    public String getIdade() {
-        return idade;
+    public String getEmail() {
+        return email;
     }
 
-    public void setIdade(String idade) {
-        this.idade = idade;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
+    public Object getNomeCompleto() {
+        return null;
+    }
+
+    public Object getDataNascimento() {
+        return null;
+    }
 }

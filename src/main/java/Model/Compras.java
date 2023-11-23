@@ -1,53 +1,66 @@
 package Model;
 
+import java.util.Date;
+
 public class Compras {
-    // Atributos
-    String cliente;
-    String carro;
-    String valor;
-    String data;
 
+    private String nome;
+    private String cpf;
+    private String telefone;
+    private String email;
 
-    // Construtor
-    public Compras(String cliente, String carro, String valor, String data) {
-        this.cliente = cliente;
-        this.carro = carro;
-        this.valor = valor;
-        this.data = data;
+    public Compras(String nome, String cpf, String telefone, String email) {
+        this.nome = nome;
+        this.cpf = cpf;
+        this.telefone = telefone;
+        this.email = email;
+    }
+
+    public Compras(Date dataVenda, String carroPlaca, String clienteCpf) {
+    }
+
+    public Compras() {
     }
 
     // Getters and Setters
-    public String getCliente() {
-        return cliente;
+    public String getNome() {
+        return nome;
     }
 
-    public void setCliente(String cliente) {
-        this.cliente = cliente;
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
-    public String getCarro() {
-        return carro;
+    public String getCpf() {
+        return cpf;
     }
 
-    public void setCarro(String carro) {
-        this.carro = carro;
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
     }
 
-    public String getValor() {
-        return valor;
+    public String getTelefone() {
+        return telefone;
     }
 
-    public void setValor(String valor) {
-        this.valor = valor;
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
     }
 
-    public String getData() {
-        return data;
+    public String getEmail() {
+        return email;
     }
 
-    public void setData(String data) {
-        this.data = data;
+    public void setEmail(String email) {
+        this.email = email;
     }
-    
 
+    public Object getDataVenda() {
+        return null;
+    }
+
+    public void registrarVenda(Date dataVenda, Carros carroSelecionado, Clientes clienteSelecionado) {
+    }
+
+    // Outros métodos conforme necessário
 }

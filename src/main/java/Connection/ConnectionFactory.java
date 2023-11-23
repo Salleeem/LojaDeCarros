@@ -6,20 +6,18 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import javax.management.RuntimeErrorException;
-
 public class ConnectionFactory {
-    // Atributos
+    // atributos
     private static final String url = "jdbc:postgresql://localhost:5432/postgres";
-    private static final String usuario = "postgres"; // nome do ADM do banco
-    private static final String senha = "postgres";
+    private static final String usuario = "postgres"; // Nome do ADM do banco
+    private static final String senha = "postgres"; // Senha do ADM do banco
 
-    // métodos
+    // Método para obter uma conexão com o banco de dados
     public static Connection getConnection() {
         try {
             return DriverManager.getConnection(url, usuario, senha);
-        } catch (Exception e) {
-            throw new RuntimeErrorException(null, "Erro ao obter conexão com o banco de dados");
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao obter conexão com o banco de dados.", e);
         }
     }
 
@@ -47,8 +45,7 @@ public class ConnectionFactory {
     }
 
     // Método para fechar a conexão, o objeto PreparedStatement e o ResultSet
-    public static void closeConnection(Connection connection, PreparedStatement stmt,
-            ResultSet rs) {
+    public static void closeConnection(Connection connection, PreparedStatement stmt, ResultSet rs) {
         closeConnection(connection, stmt);
         try {
             if (rs != null) {

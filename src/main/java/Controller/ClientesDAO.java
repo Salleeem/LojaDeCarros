@@ -10,133 +10,108 @@ import java.util.List;
 
 import Connection.ConnectionFactory;
 import Model.Clientes;
+import logs.Registro;
 
 public class ClientesDAO {
-    // Códigos para o banco de dados
-    // codigos para o banco de dados
-    // atributo
+
     private Connection connection;
     private List<Clientes> clientes;
 
-    // construtor
     public ClientesDAO() {
         this.connection = ConnectionFactory.getConnection();
     }
 
-    // métodos
-    // criar Tabela
     public void criaTabela() {
-        String sql = "CREATE TABLE IF NOT EXISTS clientes_lojacarros (CPF VARCHAR(20) PRIMARY KEY, NOME VARCHAR(255),DATA_DE_NASCIMENTO VARCHAR(10),IDADE VARCHAR(3))";
+        String sql = "CREATE TABLE IF NOT EXISTS clientes_lojaclientes (NOME VARCHAR(255),CPF VARCHAR(14) PRIMARY KEY, TELEFONE VARCHAR(20), EMAIL VARCHAR(255))";
         try (Statement stmt = this.connection.createStatement()) {
             stmt.execute(sql);
-            System.out.println("Tabela criada com sucesso.");
+            System.out.println("Tabela de clientes criada com sucesso.");
         } catch (SQLException e) {
-            throw new RuntimeException("Erro ao criar a tabela: " + e.getMessage(), e);
+            throw new RuntimeException("Erro ao criar a tabela de clientes: " + e.getMessage(), e);
         } finally {
             ConnectionFactory.closeConnection(this.connection);
         }
     }
 
-    // Listar todos os valores cadastrados
     public List<Clientes> listarTodos() {
         PreparedStatement stmt = null;
-        // Declaração do objeto PreparedStatement para executar a consulta
         ResultSet rs = null;
-        // Declaração do objeto ResultSet para armazenar os resultados da consulta
         clientes = new ArrayList<>();
-        // Cria uma lista para armazenar os carros recuperados do banco de dados
-        try {
-            stmt = connection.prepareStatement("SELECT * FROM clientes_lojacarros");
-            // Prepara a consulta SQL para selecionar todos os registros da tabela
-            rs = stmt.executeQuery();
-            // Executa a consulta e armazena os resultados no ResultSet
-            while (rs.next()) {
-                // Para cada registro no ResultSet, cria um objeto Carros com os valores do
-                // registro
 
+        try {
+            stmt = connection.prepareStatement("SELECT * FROM clientes_lojaclientes");
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
                 Clientes cliente = new Clientes(
-                        rs.getString("cpf"),
                         rs.getString("nome"),
-                        rs.getString("data_de_nascimento"),
-                        rs.getString("idade"));
-                clientes.add(cliente); // Adiciona o objeto Clientes à lista de carros
+                        rs.getString("cpf"),
+                        rs.getString("telefone"),
+                        rs.getString("email")
+                );
+                clientes.add(cliente);
             }
         } catch (SQLException ex) {
-            System.out.println(ex); // Em caso de erro durante a consulta, imprime o erro
+            System.out.println(ex);
         } finally {
             ConnectionFactory.closeConnection(connection, stmt, rs);
-
-            // Fecha a conexão, o PreparedStatement e o ResultSet
         }
-        return clientes; // Retorna a lista de clientes recuperados do banco de dados
+        return clientes;
     }
 
-    public void apagarTabela() {
-        String sql = "DROP TABLE CLIENTES_LOJACARROS";
-        try (Statement stmt = connection.createStatement()) {
-            stmt.executeUpdate(sql);
-            System.out.println("Tabela apagada com sucesso.");
-        } catch (Exception e) {
-            throw new RuntimeException("Erro ao apagar tabela.", e);
-        } finally {
-            ConnectionFactory.closeConnection(this.connection);
-        }
-    }
-
-    public void cadastrar(String cpf, String nomeCompleto, String dataNascimento, String idade) {
+    public void cadastrar(String nome, String cpf, String telefone, String email) {
         PreparedStatement stmt = null;
-        // Define a instrução SQL parametrizada para cadastrar na tabela
-        String sql = "INSERT INTO clientes_lojacarros (cpf, nome, data_de_nascimento, idade)VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO clientes_lojaclientes (nome, cpf, telefone, email) VALUES (?, ?, ?, ?)";
         try {
             stmt = connection.prepareStatement(sql);
-            stmt.setString(1, cpf.toUpperCase().trim());
-            stmt.setString(2, nomeCompleto.toUpperCase().trim());
-            stmt.setString(3, dataNascimento.trim());
-            stmt.setString(4, idade.trim());
+            stmt.setString(1, nome);
+            stmt.setString(2, cpf);
+            stmt.setString(3, telefone);
+            stmt.setString(4, email);
             stmt.executeUpdate();
-            System.out.println("Dados inseridos com sucesso");
+            System.out.println("Dados do cliente inseridos com sucesso");
+            new Registro().registrar("Cliente CPF: " + cpf + " Cadastrado com Sucesso.");
+
         } catch (SQLException e) {
-            throw new RuntimeException("Erro ao inserir dados no banco de dados.", e);
+            throw new RuntimeException("Erro ao inserir dados do cliente no banco de dados.", e);
         } finally {
             ConnectionFactory.closeConnection(connection, stmt);
         }
     }
 
-    // Atualizar dados no banco
-    public void atualizar(String cpf, String nomeCompleto, String dataNascimento, String idade) {
+    public void atualizar(String nome, String cpf, String telefone, String email) {
         PreparedStatement stmt = null;
-        // Define a instrução SQL parametrizada para atualizar dados pela placa
-        String sql = "UPDATE clientes_lojacarros SET nome = ?, data_de_nascimento = ?, idade = ? WHERE cpf = ?";
+        String sql = "UPDATE clientes_lojaclientes SET nome = ?, telefone = ?, email = ? WHERE cpf = ?";
         try {
             stmt = connection.prepareStatement(sql);
-            stmt.setString(1, nomeCompleto.toUpperCase().trim());
-            stmt.setString(2, dataNascimento.trim());
-            stmt.setString(3, idade.trim());;
-            // placa é chave primaria não pode ser alterada.
+            stmt.setString(1, nome);
+            stmt.setString(2, telefone);
+            stmt.setString(3, email);
             stmt.setString(4, cpf);
             stmt.executeUpdate();
-            System.out.println("Dados atualizados com sucesso");
+            System.out.println("Dados do cliente atualizados com sucesso");
+            new Registro().registrar("Cliente CPF: " + cpf + " Atualizado com Sucesso.");
         } catch (SQLException e) {
-            throw new RuntimeException("Erro ao atualizar dados no banco de dados.", e);
+            throw new RuntimeException("Erro ao atualizar dados do cliente no banco de dados.", e);
         } finally {
             ConnectionFactory.closeConnection(connection, stmt);
         }
     }
 
-    // Apagar dados do banco
     public void apagar(String cpf) {
         PreparedStatement stmt = null;
-        // Define a instrução SQL parametrizada para apagar dados pela placa
-        String sql = "DELETE FROM clientes_lojacarros WHERE cpf = ?";
+        String sql = "DELETE FROM clientes_lojaclientes WHERE cpf = ?";
         try {
             stmt = connection.prepareStatement(sql);
             stmt.setString(1, cpf);
-            stmt.executeUpdate(); // Executa a instrução SQL
-            System.out.println("Dado apagado com sucesso");
+            stmt.executeUpdate();
+            System.out.println("Dados do cliente apagados com sucesso");
+            new Registro().registrar("Cliente CPF: " + cpf + " Apagado do Banco com Sucesso.");
         } catch (SQLException e) {
-            throw new RuntimeException("Erro ao apagar dados no banco de dados.", e);
+            throw new RuntimeException("Erro ao apagar dados do cliente no banco de dados.", e);
         } finally {
             ConnectionFactory.closeConnection(connection, stmt);
         }
     }
 }
+
